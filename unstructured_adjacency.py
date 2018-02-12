@@ -44,8 +44,6 @@ class UnstructuredAdjacency(object):
         # Ensure node numbering starts at 0
         self._connectivity = {nvert: conn - min_node_number
                               for nvert, conn in self._connectivity.items()}
-        self.ncell_per_nvert = {nvert: conn.size / nvert
-                                for nvert, conn in self._connectivity.items()}
         self._bincount = np.bincount(concat - min_node_number)
         self._adjacency_matrix = self._make_adjacency()
 
@@ -53,6 +51,16 @@ class UnstructuredAdjacency(object):
     def ncell(self):
         """Total number of cells"""
         return sum(self.ncell_per_nvert.values())
+
+    @property
+    def ncell_per_nvert(self):
+        """Dictionary of {nvert: ncell}
+
+        For each type of element with nvert vertices, stores the nubmer of
+        cells ncell
+        """
+        return {nvert: conn.size / nvert
+                for nvert, conn in self._connectivity.items()}
 
     def _make_adjacency(self, weights=None):
         """Create adjacency matrix by reading connectivity"""
